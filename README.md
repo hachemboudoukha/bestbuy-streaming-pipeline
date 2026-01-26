@@ -36,7 +36,7 @@ The pipeline consists of four main stages:
 1.  **Clone the repo**:
     ```bash
     git clone https://github.com/hachemboudoukha/bestbuy-streaming-pipeline.git
-    cd best-buy-streaming
+    cd bestbuy-streaming-pipeline
     ```
 
 2.  **Install Dependencies**:

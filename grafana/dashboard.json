@@ -1,0 +1,164 @@
+{
+  "dashboard": {
+    "title": "E-commerce Real-Time Analytics",
+    "tags": ["ecommerce", "real-time", "kafka", "druid"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Transactions Per Minute",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "rawSql": "SELECT TIME_FLOOR(__time, 'PT1M') as time, COUNT(*) as transactions FROM \"ecommerce-topic-1\" WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' HOUR GROUP BY 1 ORDER BY 1",
+            "format": "time_series"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "custom": {
+              "lineWidth": 2,
+              "fillOpacity": 10
+            },
+            "unit": "short"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Total Revenue (Last Hour)",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+        "targets": [
+          {
+            "rawSql": "SELECT SUM(total_amount) as revenue FROM \"ecommerce-topic-1\" WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' HOUR",
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 10000, "color": "yellow"},
+                {"value": 50000, "color": "red"}
+              ]
+            },
+            "unit": "currencyUSD"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Average Order Value",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+        "targets": [
+          {
+            "rawSql": "SELECT AVG(total_amount) as avg_order FROM \"ecommerce-topic-1\" WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' HOUR",
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "thresholds"},
+            "unit": "currencyUSD"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Top 10 Products by Revenue",
+        "type": "barchart",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+        "targets": [
+          {
+            "rawSql": "SELECT product_name, SUM(total_amount) as revenue FROM \"ecommerce-topic-1\" WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' HOUR GROUP BY product_name ORDER BY revenue DESC LIMIT 10",
+            "format": "table"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "currencyUSD"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Revenue by Category",
+        "type": "piechart",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "rawSql": "SELECT category, SUM(total_amount) as revenue FROM \"ecommerce-topic-1\" WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' HOUR GROUP BY category",
+            "format": "table"
+          }
+        ],
+        "options": {
+          "legend": {"displayMode": "list", "placement": "right"}
+        }
+      },
+      {
+        "id": 6,
+        "title": "Transactions by Country",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+        "targets": [
+          {
+            "rawSql": "SELECT country, COUNT(*) as transactions, SUM(total_amount) as revenue FROM \"ecommerce-topic-1\" WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' HOUR GROUP BY country ORDER BY revenue DESC",
+            "format": "table"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Payment Methods Distribution",
+        "type": "barchart",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "rawSql": "SELECT payment_method, COUNT(*) as count FROM \"ecommerce-topic-1\" WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' HOUR GROUP BY payment_method ORDER BY count DESC",
+            "format": "table"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Device Type Distribution",
+        "type": "piechart",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+        "targets": [
+          {
+            "rawSql": "SELECT device, COUNT(*) as count FROM \"ecommerce-topic-1\" WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' HOUR GROUP BY device",
+            "format": "table"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Recent Transactions",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24},
+        "targets": [
+          {
+            "rawSql": "SELECT __time, transaction_id, customer_id, product_name, total_amount, country FROM \"ecommerce-topic-1\" ORDER BY __time DESC LIMIT 50",
+            "format": "table"
+          }
+        ]
+      }
+    ],
+    "refresh": "5s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"]
+    }
+  }
+}

@@ -34,11 +34,6 @@ GROUP BY 1
 ORDER BY 1 DESC;
 
 -- 4. Average Order Value
-SELECT 
-    AVG(price * quantity) as avg_order_value
-FROM "ecommerce-topic-1"
-WHERE __time >= CURRENT_TIMESTAMP - INTERVAL '1' DAY;
-
 -- 5. Top Customers by Spend
 SELECT 
     customer_id,
